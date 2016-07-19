@@ -17,8 +17,12 @@ fn test() {
 
 #[test]
 fn test_seek() {
-    log!(log::LogLevel::Info, "rust-systemd test_seek entry");
     let j = journal::Journal::open(journal::JournalFiles::All, false, false).unwrap();
+    if std::fs::metadata("/run/systemd/journal/").is_err() {
+        println!("missing journal files");
+        return;
+    }
+    log!(log::LogLevel::Info, "rust-systemd test_seek entry");
     assert!(j.seek(journal::JournalSeek::Head).is_ok());
     assert!(j.next_record().is_ok());
     let c1 = j.seek(journal::JournalSeek::Current);
